@@ -102,7 +102,9 @@ export default function FlightsPage() {
 
   return (
     <div className="min-h-screen bg-gray-900">
-      <Header />
+      <Header currentPage={''} setCurrentPage={function (page: string): void {
+        throw new Error('Function not implemented.');
+      } }/>
       
       <div className="pt-16 sm:pt-20">
         <div 
