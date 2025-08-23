@@ -1,10 +1,141 @@
-
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
+
+// Define Flight interface for typing
+interface Flight {
+  id: number;
+  airline: string;
+  flightNumber: string;
+  departure: string;
+  arrival: string;
+  duration: string;
+  basePrice: number;
+  taxes: number;
+  fees: number;
+  totalPrice: number;
+  stops: string;
+  aircraft: string;
+  baggage: {
+    carry: string;
+    checked: string;
+  };
+  amenities: string[];
+  cancellation: string;
+  seatSelection: string;
+  refundable: boolean;
+  availableSeats: number;
+}
+
+// Use tripTypes as a typed const array for correct typing
+const tripTypes = ['round-trip', 'one-way', 'multi-city'] as const;
+type TripType = typeof tripTypes[number];
+
+const mockFlights: Flight[] = [
+  {
+    id: 1,
+    airline: 'SkySwift Airlines',
+    flightNumber: 'SW 2451',
+    departure: '08:30 AM',
+    arrival: '11:45 AM',
+    duration: '3h 15m',
+    basePrice: 299,
+    taxes: 45,
+    fees: 25,
+    totalPrice: 369,
+    stops: 'Non-stop',
+    aircraft: 'Boeing 737-800',
+    baggage: { carry: 'Included', checked: '$35 first bag' },
+    amenities: ['Wi-Fi', 'Power outlets', 'Snacks'],
+    cancellation: 'Free cancellation within 24h',
+    seatSelection: 'From $15',
+    refundable: true,
+    availableSeats: 12,
+  },
+  {
+    id: 2,
+    airline: 'CloudJet',
+    flightNumber: 'CJ 1847',
+    departure: '02:15 PM',
+    arrival: '05:30 PM',
+    duration: '3h 15m',
+    basePrice: 249,
+    taxes: 38,
+    fees: 20,
+    totalPrice: 307,
+    stops: 'Non-stop',
+    aircraft: 'Airbus A320',
+    baggage: { carry: 'Included', checked: '$40 first bag' },
+    amenities: ['Wi-Fi', 'Entertainment', 'Beverage'],
+    cancellation: 'Free cancellation within 24h',
+    seatSelection: 'From $12',
+    refundable: false,
+    availableSeats: 8,
+  },
+  {
+    id: 3,
+    airline: 'AirVelocity',
+    flightNumber: 'AV 9623',
+    departure: '06:45 PM',
+    arrival: '10:00 PM',
+    duration: '3h 15m',
+    basePrice: 189,
+    taxes: 32,
+    fees: 18,
+    totalPrice: 239,
+    stops: 'Non-stop',
+    aircraft: 'Boeing 737-700',
+    baggage: { carry: 'Included', checked: '$45 first bag' },
+    amenities: ['Wi-Fi', 'Snacks'],
+    cancellation: 'No free cancellation',
+    seatSelection: 'From $10',
+    refundable: false,
+    availableSeats: 5,
+  },
+  {
+    id: 4,
+    airline: 'Premium Airways',
+    flightNumber: 'PA 5501',
+    departure: '11:20 AM',
+    arrival: '02:35 PM',
+    duration: '3h 15m',
+    basePrice: 459,
+    taxes: 68,
+    fees: 30,
+    totalPrice: 557,
+    stops: 'Non-stop',
+    aircraft: 'Boeing 787-9',
+    baggage: { carry: 'Included', checked: 'First bag included' },
+    amenities: ['Wi-Fi', 'Premium meals', 'Entertainment', 'Extra legroom'],
+    cancellation: 'Free cancellation within 48h',
+    seatSelection: 'Complimentary',
+    refundable: true,
+    availableSeats: 15,
+  },
+  {
+    id: 5,
+    airline: 'Budget Air',
+    flightNumber: 'BA 7739',
+    departure: '05:45 AM',
+    arrival: '09:00 AM',
+    duration: '3h 15m',
+    basePrice: 149,
+    taxes: 28,
+    fees: 15,
+    totalPrice: 192,
+    stops: 'Non-stop',
+    aircraft: 'Airbus A319',
+    baggage: { carry: 'Included (small bag)', checked: '$50 first bag' },
+    amenities: ['Basic seat'],
+    cancellation: 'No free cancellation',
+    seatSelection: 'From $8',
+    refundable: false,
+    availableSeats: 3,
+  },
+];
 
 export default function FlightSearchForm() {
-  const [tripType, setTripType] = useState('round-trip');
+  const [tripType, setTripType] = useState<TripType>('round-trip');
   const [passengers, setPassengers] = useState(1);
   const [cabinClass, setCabinClass] = useState('economy');
   const [showPassengerDropdown, setShowPassengerDropdown] = useState(false);
@@ -14,132 +145,13 @@ export default function FlightSearchForm() {
   const [toCity, setToCity] = useState('');
   const [departDate, setDepartDate] = useState('');
   const [returnDate, setReturnDate] = useState('');
-  const [selectedFlight, setSelectedFlight] = useState(null);
+  const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
   const [showFlightDetails, setShowFlightDetails] = useState(false);
   const [validationError, setValidationError] = useState('');
 
-  const mockFlights = [
-    {
-      id: 1,
-      airline: 'SkySwift Airlines',
-      flightNumber: 'SW 2451',
-      departure: '08:30 AM',
-      arrival: '11:45 AM',
-      duration: '3h 15m',
-      basePrice: 299,
-      taxes: 45,
-      fees: 25,
-      totalPrice: 369,
-      stops: 'Non-stop',
-      aircraft: 'Boeing 737-800',
-      baggage: {
-        carry: 'Included',
-        checked: '$35 first bag'
-      },
-      amenities: ['Wi-Fi', 'Power outlets', 'Snacks'],
-      cancellation: 'Free cancellation within 24h',
-      seatSelection: 'From $15',
-      refundable: true,
-      availableSeats: 12
-    },
-    {
-      id: 2,
-      airline: 'CloudJet',
-      flightNumber: 'CJ 1847',
-      departure: '02:15 PM',
-      arrival: '05:30 PM',
-      duration: '3h 15m',
-      basePrice: 249,
-      taxes: 38,
-      fees: 20,
-      totalPrice: 307,
-      stops: 'Non-stop',
-      aircraft: 'Airbus A320',
-      baggage: {
-        carry: 'Included',
-        checked: '$40 first bag'
-      },
-      amenities: ['Wi-Fi', 'Entertainment', 'Beverage'],
-      cancellation: 'Free cancellation within 24h',
-      seatSelection: 'From $12',
-      refundable: false,
-      availableSeats: 8
-    },
-    {
-      id: 3,
-      airline: 'AirVelocity',
-      flightNumber: 'AV 9623',
-      departure: '06:45 PM',
-      arrival: '10:00 PM',
-      duration: '3h 15m',
-      basePrice: 189,
-      taxes: 32,
-      fees: 18,
-      totalPrice: 239,
-      stops: 'Non-stop',
-      aircraft: 'Boeing 737-700',
-      baggage: {
-        carry: 'Included',
-        checked: '$45 first bag'
-      },
-      amenities: ['Wi-Fi', 'Snacks'],
-      cancellation: 'No free cancellation',
-      seatSelection: 'From $10',
-      refundable: false,
-      availableSeats: 5
-    },
-    {
-      id: 4,
-      airline: 'Premium Airways',
-      flightNumber: 'PA 5501',
-      departure: '11:20 AM',
-      arrival: '02:35 PM',
-      duration: '3h 15m',
-      basePrice: 459,
-      taxes: 68,
-      fees: 30,
-      totalPrice: 557,
-      stops: 'Non-stop',
-      aircraft: 'Boeing 787-9',
-      baggage: {
-        carry: 'Included',
-        checked: 'First bag included'
-      },
-      amenities: ['Wi-Fi', 'Premium meals', 'Entertainment', 'Extra legroom'],
-      cancellation: 'Free cancellation within 48h',
-      seatSelection: 'Complimentary',
-      refundable: true,
-      availableSeats: 15
-    },
-    {
-      id: 5,
-      airline: 'Budget Air',
-      flightNumber: 'BA 7739',
-      departure: '05:45 AM',
-      arrival: '09:00 AM',
-      duration: '3h 15m',
-      basePrice: 149,
-      taxes: 28,
-      fees: 15,
-      totalPrice: 192,
-      stops: 'Non-stop',
-      aircraft: 'Airbus A319',
-      baggage: {
-        carry: 'Included (small bag)',
-        checked: '$50 first bag'
-      },
-      amenities: ['Basic seat'],
-      cancellation: 'No free cancellation',
-      seatSelection: 'From $8',
-      refundable: false,
-      availableSeats: 3
-    }
-  ];
-
   const handleSearch = () => {
     setValidationError('');
-    
-    // Validate required fields
+
     if (!fromCity.trim()) {
       setValidationError('Please enter departure city');
       return;
@@ -156,33 +168,33 @@ export default function FlightSearchForm() {
       setValidationError('Please select return date');
       return;
     }
-    
-    // Check if return date is after departure date
-    if (tripType === 'round-trip' && returnDate && departDate) {
-      if (new Date(returnDate) <= new Date(departDate)) {
-        setValidationError('Return date must be after departure date');
-        return;
-      }
+    if (
+      tripType === 'round-trip' &&
+      new Date(returnDate).getTime() <= new Date(departDate).getTime()
+    ) {
+      setValidationError('Return date must be after departure date');
+      return;
     }
-    
-    // Check if departure date is not in the past
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     if (new Date(departDate) < today) {
       setValidationError('Departure date cannot be in the past');
       return;
     }
-    
+
     setShowSearchResults(true);
   };
 
-  const handleFlightSelect = (flight) => {
+  const handleFlightSelect = (flight: Flight) => {
     setSelectedFlight(flight);
     setShowFlightDetails(true);
   };
 
   const handleBookFlight = () => {
-    alert(`Booking confirmed for ${selectedFlight.airline} flight ${selectedFlight.flightNumber}. Total: $${selectedFlight.totalPrice * passengers}`);
+    if (selectedFlight === null) return;
+    alert(
+      `Booking confirmed for ${selectedFlight.airline} flight ${selectedFlight.flightNumber}. Total: $${selectedFlight.totalPrice * passengers}`
+    );
     setShowFlightDetails(false);
     setShowSearchResults(false);
   };
@@ -191,53 +203,44 @@ export default function FlightSearchForm() {
     <>
       <div className="bg-gray-900/90 backdrop-blur-sm border border-gray-700 rounded-2xl shadow-2xl p-4 sm:p-6 md:p-8 max-w-6xl mx-auto">
         <div className="flex flex-wrap gap-2 sm:gap-4 mb-4 sm:mb-6">
-          <button
-            onClick={() => setTripType('round-trip')}
-            className={`px-3 sm:px-4 md:px-6 py-2 rounded-full font-medium transition-all whitespace-nowrap cursor-pointer text-sm sm:text-base ${tripType === 'round-trip' ? 'bg-gradient-to-r from-cyan-500 to-purple-600 text-white shadow-lg' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
-          >
-            Round Trip
-          </button>
-          <button
-            onClick={() => setTripType('one-way')}
-            className={`px-3 sm:px-4 md:px-6 py-2 rounded-full font-medium transition-all whitespace-nowrap cursor-pointer text-sm sm:text-base ${tripType === 'one-way' ? 'bg-gradient-to-r from-cyan-500 to-purple-600 text-white shadow-lg' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
-          >
-            One Way
-          </button>
-          <button
-            onClick={() => setTripType('multi-city')}
-            className={`px-3 sm:px-4 md:px-6 py-2 rounded-full font-medium transition-all whitespace-nowrap cursor-pointer text-sm sm:text-base ${tripType === 'multi-city' ? 'bg-gradient-to-r from-cyan-500 to-purple-600 text-white shadow-lg' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
-          >
-            Multi City
-          </button>
+          {tripTypes.map((type) => (
+            <button
+              key={type}
+              onClick={() => setTripType(type)}
+              className={`px-3 sm:px-4 md:px-6 py-2 rounded-full font-medium transition-all whitespace-nowrap cursor-pointer text-sm sm:text-base ${
+                tripType === type
+                  ? 'bg-gradient-to-r from-cyan-500 to-purple-600 text-white shadow-lg'
+                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              }`}
+            >
+              {type.replace('-', ' ').replace(/\b\w/g, (ch) => ch.toUpperCase())}
+            </button>
+          ))}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
           <div className="relative">
             <label className="block text-sm font-medium text-gray-300 mb-2">From</label>
-            <div className="relative">
-              <input
-                type="text"
-                value={fromCity}
-                onChange={(e) => setFromCity(e.target.value)}
-                placeholder="New York (NYC)"
-                className="w-full p-3 sm:p-4 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-sm text-white placeholder-gray-400"
-              />
-              <i className="ri-flight-takeoff-line absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-            </div>
+            <input
+              type="text"
+              value={fromCity}
+              onChange={(e) => setFromCity(e.target.value)}
+              placeholder="New York (NYC)"
+              className="w-full p-3 sm:p-4 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-sm text-white placeholder-gray-400"
+            />
+            <i className="ri-flight-takeoff-line absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
           </div>
 
           <div className="relative">
             <label className="block text-sm font-medium text-gray-300 mb-2">To</label>
-            <div className="relative">
-              <input
-                type="text"
-                value={toCity}
-                onChange={(e) => setToCity(e.target.value)}
-                placeholder="Los Angeles (LAX)"
-                className="w-full p-3 sm:p-4 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-sm text-white placeholder-gray-400"
-              />
-              <i className="ri-flight-land-line absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-            </div>
+            <input
+              type="text"
+              value={toCity}
+              onChange={(e) => setToCity(e.target.value)}
+              placeholder="Los Angeles (LAX)"
+              className="w-full p-3 sm:p-4 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-sm text-white placeholder-gray-400"
+            />
+            <i className="ri-flight-land-line absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
           </div>
 
           <div className="relative">
@@ -271,7 +274,9 @@ export default function FlightSearchForm() {
               className="w-full p-3 sm:p-4 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-left text-sm cursor-pointer hover:bg-gray-700 transition-colors text-white"
             >
               <div className="flex items-center justify-between">
-                <span>{passengers} Passenger{passengers > 1 ? 's' : ''}</span>
+                <span>
+                  {passengers} Passenger{passengers > 1 ? 's' : ''}
+                </span>
                 <i className="ri-user-line text-gray-400"></i>
               </div>
               <i className="ri-arrow-down-s-line float-right text-gray-400 text-lg -mt-6"></i>
@@ -324,7 +329,10 @@ export default function FlightSearchForm() {
             </button>
             {showClassDropdown && (
               <div className="absolute top-full left-0 right-0 bg-gray-800 border border-gray-600 rounded-lg shadow-xl z-20 mt-1">
-                {[{ value: 'economy', label: 'Economy', icon: 'ri-user-line' }, { value: 'premium economy', label: 'Premium Economy', icon: 'ri-user-star-line' }, { value: 'business', label: 'Business', icon: 'ri-vip-line' }, { value: 'first', label: 'First Class', icon: 'ri-vip-crown-line' }].map((cls) => (
+                {[{ value: 'economy', label: 'Economy', icon: 'ri-user-line' },
+                  { value: 'premium economy', label: 'Premium Economy', icon: 'ri-user-star-line' },
+                  { value: 'business', label: 'Business', icon: 'ri-vip-line' },
+                  { value: 'first', label: 'First Class', icon: 'ri-vip-crown-line' }].map(cls => (
                   <button
                     key={cls.value}
                     onClick={() => {
@@ -450,8 +458,7 @@ export default function FlightSearchForm() {
                             <div className="flex items-center gap-2 mt-2">
                               {flight.refundable && (
                                 <span className="text-green-400 text-xs flex items-center gap-1">
-                                  <i className="ri-shield-check-line"></i>
-                                  Refundable
+                                  <i className="ri-shield-check-line"></i> Refundable
                                 </span>
                               )}
                               <span className="text-gray-400 text-xs">{flight.cancellation}</span>
@@ -464,9 +471,7 @@ export default function FlightSearchForm() {
                             >
                               Select Flight
                             </button>
-                            <button className="text-cyan-400 hover:text-cyan-300 text-sm cursor-pointer whitespace-nowrap">
-                              View Details
-                            </button>
+                            <button className="text-cyan-400 hover:text-cyan-300 text-sm cursor-pointer whitespace-nowrap">View Details</button>
                           </div>
                         </div>
                       </div>
@@ -552,7 +557,9 @@ export default function FlightSearchForm() {
                 <h3 className="text-white font-semibold mb-3">Price Breakdown</h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Base Fare ({passengers} passenger{passengers > 1 ? 's' : ''})</span>
+                    <span className="text-gray-400">
+                      Base Fare ({passengers} passenger{passengers > 1 ? 's' : ''})
+                    </span>
                     <span className="text-white">${selectedFlight.basePrice * passengers}</span>
                   </div>
                   <div className="flex justify-between">
@@ -594,7 +601,11 @@ export default function FlightSearchForm() {
                 <h3 className="text-white font-semibold mb-3">Policies</h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center gap-2">
-                    <i className={`ri-${selectedFlight.refundable ? 'checkbox-circle-fill text-green-400' : 'close-circle-fill text-red-400'}`}></i>
+                    <i
+                      className={`ri-${
+                        selectedFlight.refundable ? 'checkbox-circle-fill text-green-400' : 'close-circle-fill text-red-400'
+                      }`}
+                    ></i>
                     <span className="text-gray-300">
                       {selectedFlight.refundable ? 'Refundable fare' : 'Non-refundable fare'}
                     </span>
